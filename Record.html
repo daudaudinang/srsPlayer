@@ -41,6 +41,7 @@
 
       peer1.addEventListener("iceconnectionstatechange", (event) => {
         if (peer1.iceConnectionState === "failed") {
+          console.log("Looi");
           peer1.restartIce();
         }
       });
@@ -52,6 +53,8 @@
       });
 
       window.onload = () => {
+        peer1.addTransceiver("audio", {direction: "sendonly"});
+        peer1.addTransceiver("video", {direction: "sendonly"});
         navigator.mediaDevices
           .getDisplayMedia({
             video: true,
@@ -60,7 +63,6 @@
           .then((stream) => {
             document.querySelector("video").srcObject = stream;
             stream.getTracks().forEach((oneTrack) => {
-              console.log("add track success");
               peer1.addTrack(oneTrack, stream);
             });
             peer1

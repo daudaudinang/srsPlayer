@@ -5,6 +5,8 @@ import {Button} from "@mui/material";
 import {useState, useEffect} from 'react';
 
 function App() {
+  var peer2;
+  peer2 = new RTCPeerConnection(configuration);
   const [stream, setStream] = useState(new MediaStream());
   const [player, setPlayer] = useState(null);
 
@@ -33,9 +35,6 @@ function App() {
     iceServers: [{ urls: "stun:stun2.1.google.com:19302" }],
   };
 
-  var peer2;
-  peer2 = new RTCPeerConnection(configuration);
-
   const sendSDP = async (sdp) => {
     const data = {
       api: apiUrl,
@@ -47,8 +46,6 @@ function App() {
       streamurl:
         "webrtc://123.31.11.64/ywdacow15xwowa0p7jpdg0w470lws2zr/40ae931c-7f83-4ca1-bdcf-59863b8ec71d",
     };
-    console.log("Send", data);
-
     return await fetch(apiUrl, {
       method: "POST",
       headers: {
@@ -77,7 +74,7 @@ function App() {
     setStream(event.streams[0]);
   });
 
-  const handleClick = (event) => {
+  const handleConnect = (event) => {
     peer2.addTransceiver("audio", {direction: "recvonly"});
       peer2.addTransceiver("video", {direction: "recvonly"});
 
@@ -100,9 +97,15 @@ function App() {
         });
   }
 
+  const handleDisconnect = () => {
+    peer2.close();
+    setStream(null);
+  }
+
   return (
     <>
-      <Button variant="contained" onClick={handleClick} color='primary'>Click to watch stream</Button>
+      <Button variant="contained" onClick={handleConnect} color='primary'>Click to watch stream</Button>
+      <Button variant="contained" onClick={handleDisconnect} color='primary'>Click to disconnect</Button>
       <video id="my-player" className="video-js vjs-theme-forest"></video>
       {/* <video id="my-player" className="video-js"></video> */}
     </>

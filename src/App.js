@@ -9,20 +9,32 @@ function App() {
   peer2 = new RTCPeerConnection(configuration);
   const [stream, setStream] = useState(new MediaStream());
   const [player, setPlayer] = useState(null);
+  const [playing, setPlaying] = useState(false);
 
   useEffect(() => {
     window.onload = () => {
+      let i = false;
+      const myClickHandler = (event) => {
+        if(event.target.paused) document.querySelector("#my-player video").play();
+        else document.querySelector("#my-player video").pause();
+      }
+
       const play = videojs("#my-player", {
         autoplay: true,
         controls: true,
         preload: 'auto',
         width: 1080,
         height: 720,
+        userActions: {
+          click: myClickHandler
+        }
       });
       play.ready(() => {
         document.querySelector(".vjs-play-control").onclick = (e) => {
           if(e.target.parentNode.textContent === "Play") document.querySelector("#my-player video").play();
         }
+        play.on("play", () => setPlaying(true));
+        play.on("pause", () => setPlaying(false));
         setPlayer(play);
       })
     }

@@ -12,7 +12,6 @@ function App() {
 
   useEffect(() => {
     window.onload = () => {
-      let i = false;
       const myClickHandler = (event) => {
         if(event.target.paused) document.querySelector("#my-player video").play();
         else document.querySelector("#my-player video").pause();

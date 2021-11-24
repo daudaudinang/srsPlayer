@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <video id="videoSource" autoplay></video>
+    <script>
+      const apiUrl = "http://123.31.11.64:1985/rtc/v1/publish/";
+      var configuration = {
+        iceServers: [{ urls: "stun:stun2.1.google.com:19302" }],
+      };
+      var peer1;
+      peer1 = new RTCPeerConnection(configuration);
+
+      const sendSDP = async (sdp) => {
+        const data = {
+          api: apiUrl,
+          tid: Number(parseInt(new Date().getTime() * Math.random() * 100))
+            .toString(16)
+            .substr(0, 7),
+          sdp: sdp,
+          clientip: null,
+          streamurl:
+            "webrtc://123.31.11.64/ywdacow15xwowa0p7jpdg0w470lws2zr/40ae931c-7f83-4ca1-bdcf-59863b8ec71d",
+        };
+        console.log("Send Offer", data);
+        return await fetch(apiUrl, {
+          method: "POST",
+          headers: {
+            "Content-type": "application/json; charset=UTF-8",
+          },
+          body: JSON.stringify(data),
+        })
+          .then((res) => res.json())
+          .catch((err) => err);
+      };
+
+      peer1.addEventListener("iceconnectionstatechange", (event) => {
+        if (peer1.iceConnectionState === "failed") {
+          peer1.restartIce();
+        }
+      });
+
+      peer1.addEventListener("icecandidate", (event) => {
+        if (event.candidate) {
+          console.log("icecandidate");
+        }
+      });
+
+      window.onload = () => {
+        navigator.mediaDevices
+          .getDisplayMedia({
+            video: true,
+            audio: true,
+          })
+          .then((stream) => {
+            document.querySelector("video").srcObject = stream;
+            stream.getTracks().forEach((oneTrack) => {
+              console.log("add track success");
+              peer1.addTrack(oneTrack, stream);
+            });
+            peer1
+              .createOffer()
+              .then((offer) => {
+                console.log(offer);
+                peer1.setLocalDescription(offer);
+                sendSDP(offer.sdp).then((data) => {
+                  
+                  const remoteAnswer = new RTCSessionDescription({
+                    type: "answer",
+                    sdp: data.sdp,
+                  });
+                  console.log(remoteAnswer);
+                  peer1.setRemoteDescription(remoteAnswer);
+                });
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+          });
+      };
+    </script>
+  </body>
+</html>

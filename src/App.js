@@ -12,13 +12,19 @@ function App() {
 
   useEffect(() => {
     window.onload = () => {
-      setPlayer(videojs("#my-player", {
+      const play = videojs("#my-player", {
         autoplay: true,
         controls: true,
-        liveui: true,
+        preload: 'auto',
         width: 1080,
-        height: 720
-      }));
+        height: 720,
+      });
+      play.ready(() => {
+        document.querySelector(".vjs-play-control").onclick = (e) => {
+          if(e.target.parentNode.textContent === "Play") document.querySelector("#my-player video").play();
+        }
+        setPlayer(play);
+      })
     }
   }, [player]);
 
@@ -26,7 +32,6 @@ function App() {
     if(player) {
       player.tech().el().srcObject = stream;
     }
-    
   },[stream, player]);
 
   const apiUrl = "http://123.31.11.64:1985/rtc/v1/play/";
@@ -102,9 +107,18 @@ function App() {
     setStream(null);
   }
 
+  // const handleClick = () => {
+  //   player.pause();
+  // }
+  // const handleClick2 = () => {
+  //   document.querySelector("video").play();
+  //   player.play();
+  // }
   return (
     <>
       <Button variant="contained" onClick={handleConnect} color='primary'>Click to watch stream</Button>
+      {/* <Button variant="contained" onClick={handleClick} color='primary'>Click</Button>
+      <Button variant="contained" onClick={handleClick2} color='primary'>Click 2</Button> */}
       <Button variant="contained" onClick={handleDisconnect} color='primary'>Click to disconnect</Button>
       <video id="my-player" className="video-js vjs-theme-forest"></video>
       {/* <video id="my-player" className="video-js"></video> */}

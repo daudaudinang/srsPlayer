@@ -32,8 +32,6 @@ function App() {
         document.querySelector(".vjs-play-control").onclick = (e) => {
           if(e.target.parentNode.textContent === "Play") document.querySelector("#my-player video").play();
         }
-        play.on("play", () => setPlaying(true));
-        play.on("pause", () => setPlaying(false));
         setPlayer(play);
       })
     }

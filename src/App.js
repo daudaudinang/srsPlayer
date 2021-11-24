@@ -9,7 +9,6 @@ function App() {
   peer2 = new RTCPeerConnection(configuration);
   const [stream, setStream] = useState(new MediaStream());
   const [player, setPlayer] = useState(null);
-  const [playing, setPlaying] = useState(false);
 
   useEffect(() => {
     window.onload = () => {
